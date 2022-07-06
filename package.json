@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A library of interactive 3D react components created using the react-three ecosystem.",
   "main": "index.js",
+  "typings": "index.d.ts",
   "scripts": {
     "build": "webpack",
     "serve": "webpack serve"
