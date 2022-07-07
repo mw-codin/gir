@@ -1,2 +1,2 @@
-### gir
+# gir
 A library of interactive 3D react components and hooks.
