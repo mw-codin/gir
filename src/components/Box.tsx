@@ -1,27 +1,38 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RootState, useFrame } from '@react-three/fiber';
-import { Mesh, Vector3 } from 'three';
-import getValueInRange from '../../util/getValueInRangeFromNormalizedValue';
+import { Mesh, MeshLambertMaterial, Vector3 } from 'three';
+import getValueInRange from '../util/getValueInRangeFromNormalizedValue';
+import Canvas from './Canvas';
 
 const up = new Vector3(0, 1, 0);
 
-export default function Box(props: any) {
+export interface BoxProps {
+  speed?: number;
+  resistance?: number;
+  color?: [number, number, number];
+  scale?: number;
+  position?: [number, number, number];
+  breatheRate?: number;
+  breatheAmplitude?: number;
+}
+
+export const _Box: React.FC<BoxProps> = (props: any) => {
   const {
-    speed = .5,
-    resistance = .5,
-    color = [255, 0, 0],
+    speed = 0.5,
+    resistance = 0.5,
+    color = [0, 255, 0],
     scale = 1,
     position = [0, 0, 0],
-    breatheRate = .5,
-    breatheAmplitude = .5
+    breatheRate = 1,
+    breatheAmplitude = 0.2,
   } = props;
 
   const boxRef = useRef<Mesh>();
   const dragging = useRef<boolean>(false);
-  const xVelocity = useRef<number>(Math.random() / 10 - .05);
-  const yVelocity = useRef<number>(Math.random() / 10 - .05);
-  const t = useRef<number>(0);
-  const [hovered, hover] = useState(false);
+  const xVelocity = useRef<number>(Math.random() / 10 - 0.05);
+  const yVelocity = useRef<number>(Math.random() / 10 - 0.05);
+  const t = useRef<number>(Math.PI / 2);
+  const hovered = useRef<boolean>(false);
 
   // sin wave based breathing
   const breathe = () => {
@@ -30,11 +41,13 @@ export default function Box(props: any) {
     const currentWorldPosition = new Vector3();
     boxRef.current.getWorldPosition(currentWorldPosition);
 
-    const newYCoordinate = currentWorldPosition.y + Math.sin(t.current) * getValueInRange(0.001, 0.01, breatheAmplitude);
+    const newYCoordinate =
+      currentWorldPosition.y +
+      Math.sin(t.current) * getValueInRange(0.001, 0.01, breatheAmplitude);
     boxRef.current.position.y = newYCoordinate;
 
     t.current += getValueInRange(0.001, 0.01, breatheRate);
-  }
+  };
 
   const handleDrag = (state: RootState) => {
     if (!boxRef.current) return;
@@ -59,17 +72,18 @@ export default function Box(props: any) {
       .cross(fromCameraToCubeCross)
       .normalize();
 
-    boxRef.current.rotateOnWorldAxis(fromCameraToCubeDoubleCross, -xVelocity.current);
+    boxRef.current.rotateOnWorldAxis(
+      fromCameraToCubeDoubleCross,
+      -xVelocity.current
+    );
     boxRef.current.rotateOnWorldAxis(fromCameraToCubeCross, -yVelocity.current);
   };
 
   const airResistance = () => {
-    if (Math.abs(xVelocity.current) > .002)
-      xVelocity.current *= 0.98;
+    if (Math.abs(xVelocity.current) > 0.002) xVelocity.current *= 0.98;
 
-    if (Math.abs(yVelocity.current) > .002)
-      yVelocity.current *= 0.98;
-  }
+    if (Math.abs(yVelocity.current) > 0.002) yVelocity.current *= 0.98;
+  };
 
   // animation loop hook
   useFrame((state) => {
@@ -89,25 +103,22 @@ export default function Box(props: any) {
   };
   const handlePointerDown = (e: MouseEvent) => {
     if (e.type === 'pointerdown') {
-      document.body.style.cursor = 'grabbing'
+      document.body.style.cursor = 'grabbing';
       dragging.current = true;
     }
   };
   const handlePointerUp = (e: MouseEvent) => {
     dragging.current = false;
-    if (hovered)
-      document.body.style.cursor = 'grab';
-    else
-      document.body.style.cursor = '';
+    if (hovered.current) document.body.style.cursor = 'grab';
+    else document.body.style.cursor = '';
   };
   const handlePointerOver = (e: MouseEvent) => {
-    hover(true);
+    hovered.current = true;
     document.body.style.cursor = 'grab';
   };
   const handlePointerLeave = (e: MouseEvent) => {
-    hover(false);
-    if (!dragging.current)
-      document.body.style.cursor = '';
+    hovered.current = false;
+    if (!dragging.current) document.body.style.cursor = '';
   };
 
   useEffect(() => {
@@ -120,7 +131,6 @@ export default function Box(props: any) {
   }, []);
 
   return (
-    <>
       <mesh
         {...props}
         ref={boxRef}
@@ -135,8 +145,17 @@ export default function Box(props: any) {
         position={position}
       >
         <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color={color} />
+        <meshLambertMaterial color={color} />
       </mesh>
-    </>
   );
+};
+
+const Box: React.FC<BoxProps> = (props) => {
+  return (
+    <Canvas>
+      <_Box {...props} />
+    </Canvas>
+  )
 }
+
+export default Box;
