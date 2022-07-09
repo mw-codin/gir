@@ -1,1 +1,1 @@
-import * as Standalone from './src/components/standalone';
+export * from './src/components';
