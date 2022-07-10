@@ -17,32 +17,23 @@ export interface BoxProps {
 
 export const _Box: React.FC<BoxProps> = (props: any) => {
   const {
-    speed = 0.5,
-    resistance = 0.5,
     color = [0, 255, 0],
-    scale = 1,
-    position = [0, 0, 0],
     breatheRate = 1,
     breatheAmplitude = 0.2,
   } = props;
 
-  const [boxRef, onPointerDown, onPointerUp, onPointerOver, onPointerLeave] =
-    useDraggableFloatingAnimation(breatheAmplitude, breatheRate);
+  const [boxRef, eventHandlers] = useDraggableFloatingAnimation(
+    breatheAmplitude,
+    breatheRate
+  );
 
   return (
     <mesh
-      {...props}
       ref={boxRef}
-      scale={scale}
-      onPointerOver={onPointerOver}
-      onPointerLeave={onPointerLeave}
-      onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
-      castShadow
-      receiveShadow
-      position={position}
+      {...eventHandlers}
+      {...props}
     >
-      <boxGeometry args={[1, 1, 1]} />
+      <boxGeometry />
       <meshLambertMaterial color={color} />
     </mesh>
   );

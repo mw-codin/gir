@@ -103,24 +103,22 @@ const useDraggableFloatingAnimation = (
   };
 
   useEffect(() => {
-    console.log(boxRef.current);
     document.addEventListener('pointermove', handleMouseMove);
     document.addEventListener('pointerup', onPointerUp);
-    boxRef.current?.addEventListener('pointerdown', onPointerDown);
-    boxRef.current?.addEventListener('pointerup', onPointerUp);
-    boxRef.current?.addEventListener('pointerover', onPointerOver);
-    boxRef.current?.addEventListener('pointerleave', onPointerLeave);
     return () => {
       document.removeEventListener('pointermove', handleMouseMove);
       document.removeEventListener('pointerup', onPointerUp);
-      boxRef.current?.removeEventListener('pointerdown', onPointerDown);
-      boxRef.current?.removeEventListener('pointerup', onPointerUp);
-      boxRef.current?.removeEventListener('pointerover', onPointerOver);
-      boxRef.current?.removeEventListener('pointerleave', onPointerLeave);
     };
   }, []);
 
-  return [boxRef, onPointerDown, onPointerUp, onPointerOver, onPointerLeave];
+  const eventHandlers = {
+    onPointerDown,
+    onPointerUp,
+    onPointerOver,
+    onPointerLeave
+  };
+
+  return [boxRef, eventHandlers];
 };
 
 export default useDraggableFloatingAnimation;
