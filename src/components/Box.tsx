@@ -1,7 +1,7 @@
 import React from 'react';
 import { Vector3 } from 'three';
-import Canvas from './Canvas';
 import useDraggableFloatingAnimation from '../hooks/useDraggableFloatingAnimation';
+import withCanvas from '../hoc/withCanvas';
 
 const up = new Vector3(0, 1, 0);
 
@@ -39,12 +39,4 @@ export const _Box: React.FC<BoxProps> = (props: any) => {
   );
 };
 
-const Box: React.FC<BoxProps> = (props) => {
-  return (
-    <Canvas>
-      <_Box {...props} />
-    </Canvas>
-  );
-};
-
-export default Box;
+export default withCanvas<BoxProps>(_Box);
